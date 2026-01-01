@@ -21,3 +21,10 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Conten-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+func HealthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"status": "OK",
+	})
+}

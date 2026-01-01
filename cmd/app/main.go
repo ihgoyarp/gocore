@@ -4,23 +4,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-
-	"goc/internal/handler"
+	"goc/internal/config"
+	"goc/internal/middleware"
+	"goc/internal/router"
 )
 
 func main() {
-	r := chi.NewRouter()
+	cfg := config.Load()
 
-	// middleware global
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	r := router.New()
 
-	r.Get("/health", handler.HealthCheck)
-	r.Post("/echo", handler.EchoHandler)
+	handlerChain := middleware.Recover(
+		middleware.Logger(r),
+	)
 
-	log.Println("Server running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Printf("%s running on :%s\n", cfg.AppName, cfg.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, handlerChain))
 }

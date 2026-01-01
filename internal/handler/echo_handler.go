@@ -9,11 +9,19 @@ import (
 )
 
 func EchoHandler(w http.ResponseWriter, r *http.Request) {
-	var req domain.EchoRequest
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "invalid json", http.StatusBadRequest)
+	var req domain.EchoRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid json body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Message == "" {
+		http.Error(w, "message is required", http.StatusBadRequest)
 		return
 	}
 
